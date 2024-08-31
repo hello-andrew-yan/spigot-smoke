@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/smoke.png" alt="Smoke Icon"></p>
 <h1 align="center">Smoke</h1>
 
-<p align="center">This guide provides a basic breakdown of how to implement a smoke sphere in Minecraft using the SpigotAPI. The goal is to create a smoke effect that interacts with players and mobs, adding an immersive experience to your game.</p>
+<p align="center">This guide provides a basic breakdown of how to implement a smoke sphere in Minecraft using the SpigotAPI.</p>
 
 ---
 
@@ -11,8 +11,8 @@ To achieve the desired smoke effect, we need to meet the following criteria:
 
 - **Particle Generation**: Generate particles across the surface of a sphere rather than filling the entire sphere with particles. This approach reduces the computational intensity.
 - **Player Interaction**: Ensure that players who walk into the smoke region experience blindness. Conversely, players should regain visibility when leaving the smoke.
-- **Mob Interaction**: When mobs enter the smoke region, their target should be removed. This adds complexity and depth to the smoke effect to extend to mobs as well.
-- **Block Collision**: The smoke should conform to surrounding geometry by correctly colliding with obstructing blocks.
+- **Mob Interaction**: When mobs enter the smoke region ~~their target should be removed~~ they will experience slowness (Constantly setting the mob target to `null` is too slow compared to the actual mob targetting event in native Minecraft). This adds complexity and depth to the smoke effect to extend to mobs as well.
+- **Block Collision**: The smoke should dynamically conform to surrounding geometry by correctly colliding with obstructing blocks.
 
 ## Implementation
 
@@ -30,13 +30,13 @@ where:
 
 We will be iterating through values of $\theta$ and $\phi$ using a set step size, generating the coordinates on the surface of a sphere with radius $\rho$, centered at $(0, 0, 0)$. These coordinates will be used to offset the position the smoke correctly around some set center coordinate.
 
-We will be storing the points in a `HashMap` for retrieval of data points in constant time on average.
+We will be storing the points in a `List` .
 
 ```java
-HashMap<Location, Integer> cells = new HashMap<>();
+List<Location> cells = new ArrayList<>();
 ```
 
-Through experimentation, I found that using the step size $\pi / \rho$ in our nested for loops works the best in terms of accurately depicting the surface of the sphere with limited holes. Addtionally using the `CAMPFIRE_COSY_SMOKE` particle allowed for a sufficiently large particle that can create a detailed and dense sphere.
+Through experimentation, I found that using the step size $\pi / 2\rho$ in our nested for loops works the best in terms of accurately depicting the surface of the sphere with limited holes. Addtionally using the `CAMPFIRE_COSY_SMOKE` particle allowed for a sufficiently large particle that can create a detailed smoke sphere.
 
 ```java
 double step_size = PI/radius;
@@ -50,17 +50,18 @@ for (double theta = 0; theta < 2 * PI; theta += step_size) {
 }
 ```
 
-Within this loop, we check whether a point has already been added to the HashMap with the constant value of 1. This is to ensure that we can use the HashMap data structure effectively; the value is not used, only the keys.
+Within this loop, we will now iterate through all the surface points of the sphere and add those results to our `List`.
 
 ```java
 Location point = center.clone().add(x, y, z);
-if (cells.containsKey(point)) continue;
-cells.putIfAbsent(point, 1);
+World world = point.getWorld();
+if (world == null) continue;
+cells.add(point);
 ```
 
 ### Block Collision
 
-With the position points for the sphere’s surface generated, we need to address block collision. If particles are spawned without considering block collisions, the effect may not conform to the surrounding environment realistically.
+With the position points for the sphere’s surface generated, we need to address block collision. If particles are spawned without considering block collisions, the effect may not conform to the surrounding environment realistically and it'll appear to go through walls.
 
 To handle this, we use RayTraceResult. By casting a line the length of the radius from each point towards the center, we can determine if there is a block in the way. If so, we adjust the smoke's position to the maximum distance it can reach before hitting the block. We will additionally 
 
