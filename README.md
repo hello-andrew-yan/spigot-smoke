@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/smoke.png" alt="Smopke Icon"></p>
+<p align="center"><img src="assets/smoke.png" alt="Smoke Icon"></p>
 <h1 align="center">Smoke</h1>
 
 <p align="center">This guide provides a basic breakdown of how to implement a smoke sphere in Minecraft using the SpigotAPI. The goal is to create a smoke effect that interacts with players and mobs, adding an immersive experience to your game.</p>
