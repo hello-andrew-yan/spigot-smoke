@@ -1,0 +1,4 @@
+name: Smoke
+version: '${project.version}'
+main: io.github.helloandrewyan.smoke.Smoke
+api-version: '1.18'
