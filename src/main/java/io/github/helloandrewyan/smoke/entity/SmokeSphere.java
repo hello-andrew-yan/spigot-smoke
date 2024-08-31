@@ -22,8 +22,6 @@ public class SmokeSphere {
 
 		private static final List<BukkitTask> activeTasks = new ArrayList<>();
 
-		private static final double BLOCK_THRESHOLD = 1.5;
-
 		private static final long PERIOD = 5;
 		private static final int TICKS_PER_SECOND = 20;
 
@@ -31,9 +29,11 @@ public class SmokeSphere {
 		private static final double PARTICLE_OFFSET = 0.5;
 		private static final double PARTICLE_SPEED = 0.01;
 
+		private static final double POTION_DURATION = 1.5f;
+		private static final int POTION_AMPLIFIER = 1;
+
 		private static final Predicate<Entity> ENTITY_FILTER = entity ->
-						(entity instanceof Mob mob && mob.getTarget() != null)
-										|| (entity instanceof Player);
+						(entity instanceof Mob) || (entity instanceof Player);
 
 		private static List<Location> getSmokeSurface(Location center, double radius) {
 				List<Location> cells = new ArrayList<>();
@@ -71,31 +71,30 @@ public class SmokeSphere {
 										return;
 								}
 								for (Location location : surface) {
-										// Calculate direction vector.
 										Vector direction = location.clone().subtract(center).toVector();
-
-										// Ray trace for blocks.
 										RayTraceResult blockResult = world.rayTraceBlocks(center, direction, radius);
 										Location finalPointLocation = (blockResult != null && blockResult.getHitBlock() != null)
-														? blockResult.getHitBlock().getLocation().subtract(direction.multiply(BLOCK_THRESHOLD))
+														? blockResult.getHitBlock().getLocation().subtract(direction)
 														: location;
-
-										// Spawn particles.
 										world.spawnParticle(CAMPFIRE_COSY_SMOKE, finalPointLocation, PARTICLE_AMOUNT,
 														PARTICLE_OFFSET, PARTICLE_OFFSET, PARTICLE_OFFSET, PARTICLE_SPEED);
 
-										// Ray trace for entities.
 										RayTraceResult entityResult = world.rayTraceEntities(center, direction, radius, ENTITY_FILTER);
-
-										// Process entity if found.
 										if (entityResult != null && entityResult.getHitEntity() != null) {
 												Entity entity = entityResult.getHitEntity();
-
 												if (entity instanceof Player player) {
-														player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));
+														player.addPotionEffect(new PotionEffect(
+																		PotionEffectType.BLINDNESS,
+																		(int) (POTION_DURATION * TICKS_PER_SECOND),
+																		POTION_AMPLIFIER
+														));
 												}
 												if (entity instanceof Mob mob) {
-														mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
+														mob.addPotionEffect(new PotionEffect(
+																		PotionEffectType.SLOW,
+																		(int) (POTION_DURATION * TICKS_PER_SECOND),
+																		POTION_AMPLIFIER
+														));
 												}
 										}
 								}
