@@ -6,7 +6,6 @@ public final class Smoke extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        tEST
 
     }
 
