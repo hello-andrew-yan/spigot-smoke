@@ -3,9 +3,7 @@ package io.github.helloandrewyan.smoke.entity;
 import io.github.helloandrewyan.smoke.Smoke;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,12 +27,12 @@ public class SmokeSphere {
 		private static final long PERIOD = 5;
 		private static final int TICKS_PER_SECOND = 20;
 
-		private static final int PARTICLE_AMOUNT = 3;
+		private static final int PARTICLE_AMOUNT = 1;
 		private static final double PARTICLE_OFFSET = 0.5;
 		private static final double PARTICLE_SPEED = 0.01;
 
 		private static final Predicate<Entity> ENTITY_FILTER = entity ->
-						(entity instanceof Creature && ((Creature) entity).getTarget() != null)
+						(entity instanceof Mob mob && mob.getTarget() != null)
 										|| (entity instanceof Player);
 
 		private static List<Location> getSmokeSurface(Location center, double radius) {
@@ -79,7 +77,7 @@ public class SmokeSphere {
 										// Ray trace for blocks.
 										RayTraceResult blockResult = world.rayTraceBlocks(center, direction, radius);
 										Location finalPointLocation = (blockResult != null && blockResult.getHitBlock() != null)
-														? blockResult.getHitBlock().getLocation().subtract(direction).multiply(BLOCK_THRESHOLD)
+														? blockResult.getHitBlock().getLocation().subtract(direction.multiply(BLOCK_THRESHOLD))
 														: location;
 
 										// Spawn particles.
@@ -95,8 +93,9 @@ public class SmokeSphere {
 
 												if (entity instanceof Player player) {
 														player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));
-												} else if (entity instanceof Creature creature) {
-														creature.setTarget(null);
+												}
+												if (entity instanceof Mob mob) {
+														mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 												}
 										}
 								}
