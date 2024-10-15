@@ -121,7 +121,7 @@ BukkitTask task = new BukkitRunnable() {
 
 Now we will begin assessing whether a surface point has block collisions between it and the center of the smoke sphere. We can achieve this using the `RayTraceResult` class with a diagram of the concept shown below:
 
-<p align="center"><img src="assets/diagram.png" alt="Smoke Diagram"></p>
+[comment]: <> (<p align="center"><img src="assets/diagram.png" alt="Smoke Diagram"></p>)
 
 Note that the `X` denotes the point in which a block collision has been detected from the bottom surface points. We will begin to code this now:
 
