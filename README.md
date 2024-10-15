@@ -159,4 +159,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-<p align="right"><a target="_blank" href="https://icons8.com/icons/set/smoke-grenade">Smoke Grenade</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
+<p align="right"><a target="_blank" href="https://icons8.com/icon/bLJbnOidrE62/smoke-grenade">Smoke Grenade</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
